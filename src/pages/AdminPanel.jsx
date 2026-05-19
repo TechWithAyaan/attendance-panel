@@ -35,10 +35,14 @@ export default function AdminPanel() {
   const [replyModal, setReplyModal] = useState(null);
   const [replyText, setReplyText] = useState("");
   const [sendingReply, setSendingReply] = useState(false);
+  const [leaves, setLeaves] = useState([]);
+  const [advances, setAdvances] = useState([]);
 
   useEffect(() => { fetchUsers(); }, []);
   useEffect(() => {
     if (tab === "reports") fetchReports();
+    if (tab === "leaves") fetchLeaves();
+    if (tab === "advances") fetchAdvances();
   }, [tab]);
   useEffect(() => {
     const handler = () => setMenuOpen(null);
@@ -63,6 +67,40 @@ export default function AdminPanel() {
       list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       setReports(list);
     } catch {}
+  }
+
+  async function fetchLeaves() {
+    try {
+      const snap = await getDocs(collection(db, "leaves"));
+      const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      list.sort((a, b) => new Date(b.date) - new Date(a.date));
+      setLeaves(list);
+    } catch {}
+  }
+
+  async function fetchAdvances() {
+    try {
+      const snap = await getDocs(collection(db, "advances"));
+      const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      setAdvances(list);
+    } catch {}
+  }
+
+  async function handleLeaveAction(id, status) {
+    try {
+      await updateDoc(doc(db, "leaves", id), { status });
+      toast.success(`Leave ${status}`);
+      fetchLeaves();
+    } catch { toast.error("Failed to update leave"); }
+  }
+
+  async function handleAdvanceAction(id, status) {
+    try {
+      await updateDoc(doc(db, "advances", id), { status });
+      toast.success(`Advance request ${status}`);
+      fetchAdvances();
+    } catch { toast.error("Failed to update advance"); }
   }
 
   async function handleCheckIn() {
@@ -207,6 +245,8 @@ export default function AdminPanel() {
           <button className={tab === "reports" ? "active" : ""} onClick={() => setTab("reports")}>
             <span>🚨</span> Reports {unreadReports > 0 && <span className="badge-count">{unreadReports}</span>}
           </button>
+          <button className={tab === "leaves" ? "active" : ""} onClick={() => setTab("leaves")}><span>🏖️</span> Leaves</button>
+          <button className={tab === "advances" ? "active" : ""} onClick={() => setTab("advances")}><span>💵</span> Advances</button>
         </nav>
         <div className="sidebar-footer">
           <div className="admin-info">
@@ -347,6 +387,73 @@ export default function AdminPanel() {
                       <button className="btn-reply" onClick={() => { setReplyModal(r); setReplyText(""); }}>
                         💬 Reply
                       </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+        {/* LEAVES TAB */}
+        {tab === "leaves" && (
+          <div>
+            <div className="page-header"><div><h2>Leave Requests</h2><p>Approve or reject employee leave requests</p></div></div>
+            {leaves.length === 0 ? (
+              <div className="empty-state-box"><div className="empty-icon">🏖️</div><h3>No leave requests</h3></div>
+            ) : (
+              <div className="reports-list">
+                {leaves.map((l) => (
+                  <div key={l.id} className={`report-card ${l.status === "approved" ? "resolved" : ""}`}
+                    style={{ borderLeftColor: l.status === "approved" ? "var(--success)" : l.status === "rejected" ? "var(--danger)" : "var(--warning)" }}>
+                    <div className="report-top">
+                      <div className="report-user">
+                        <div className="report-av">{l.userName?.[0]?.toUpperCase()}</div>
+                        <div><strong>{l.userName}</strong><span>{l.date}</span></div>
+                      </div>
+                      <span className={`report-status ${l.status === "approved" ? "resolved" : "open"}`}>
+                        {l.status === "approved" ? "✅ Approved" : l.status === "rejected" ? "❌ Rejected" : "⏳ Pending"}
+                      </span>
+                    </div>
+                    <p className="report-msg">{l.reason}</p>
+                    {l.status === "pending" && (
+                      <div style={{ display: "flex", gap: 8 }}>
+                        <button className="btn-reply" style={{ background: "#d1fae5", color: "#065f46" }} onClick={() => handleLeaveAction(l.id, "approved")}>✅ Approve</button>
+                        <button className="btn-reply" style={{ background: "#fee2e2", color: "#991b1b" }} onClick={() => handleLeaveAction(l.id, "rejected")}>❌ Reject</button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ADVANCES TAB */}
+        {tab === "advances" && (
+          <div>
+            <div className="page-header"><div><h2>Advance Requests</h2><p>Approve or reject advance salary requests</p></div></div>
+            {advances.length === 0 ? (
+              <div className="empty-state-box"><div className="empty-icon">💵</div><h3>No advance requests</h3></div>
+            ) : (
+              <div className="reports-list">
+                {advances.map((a) => (
+                  <div key={a.id} className="report-card"
+                    style={{ borderLeftColor: a.status === "approved" ? "var(--success)" : a.status === "rejected" ? "var(--danger)" : "var(--warning)" }}>
+                    <div className="report-top">
+                      <div className="report-user">
+                        <div className="report-av">{a.userName?.[0]?.toUpperCase()}</div>
+                        <div><strong>{a.userName}</strong><span style={{ color: "var(--success)", fontWeight: 700 }}>Rs. {Number(a.amount).toLocaleString()}</span></div>
+                      </div>
+                      <span className={`report-status ${a.status === "approved" ? "resolved" : "open"}`}>
+                        {a.status === "approved" ? "✅ Approved" : a.status === "rejected" ? "❌ Rejected" : "⏳ Pending"}
+                      </span>
+                    </div>
+                    <p className="report-msg">{a.reason}</p>
+                    {a.status === "pending" && (
+                      <div style={{ display: "flex", gap: 8 }}>
+                        <button className="btn-reply" style={{ background: "#d1fae5", color: "#065f46" }} onClick={() => handleAdvanceAction(a.id, "approved")}>✅ Approve</button>
+                        <button className="btn-reply" style={{ background: "#fee2e2", color: "#991b1b" }} onClick={() => handleAdvanceAction(a.id, "rejected")}>❌ Reject</button>
+                      </div>
                     )}
                   </div>
                 ))}

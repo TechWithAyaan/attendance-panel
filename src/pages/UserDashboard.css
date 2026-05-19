@@ -406,3 +406,101 @@
   transition: background 0.2s; font-family: inherit;
 }
 .restricted-card .btn-primary:hover { background: #dc2626; }
+
+/* ── Dark Mode ── */
+body.dark { background: #0f0f1a; color: #e2e8f0; }
+body.dark .dash-page { background: #0f0f1a; }
+body.dark .dash-header { background: #0d0b1e; }
+body.dark .dash-profile, body.dark .dash-table-card, body.dark .report-form-card,
+body.dark .report-card, body.dark .notif-card, body.dark .dash-stat,
+body.dark .dash-tabs { background: #1a1a2e; color: #e2e8f0; border-color: #2d2d4e; }
+body.dark .dash-tabs button { color: #94a3b8; }
+body.dark .dash-tabs button.active { background: var(--primary); color: white; }
+body.dark input, body.dark select, body.dark textarea { background: #0f0f1a; color: #e2e8f0; border-color: #2d2d4e; }
+body.dark .ud-table th { background: #1a1a2e; color: #94a3b8; }
+body.dark .ud-table td { border-color: #2d2d4e; }
+body.dark .ud-table tr:hover td { background: #1e1e35; }
+body.dark .month-picker { background: #1a1a2e; color: #e2e8f0; }
+body.dark .cal-wrap { background: #1a1a2e; }
+body.dark .cal-cell { background: #0f0f1a; color: #e2e8f0; border-color: #2d2d4e; }
+body.dark .cal-cell.today { background: #1e1b4b; }
+
+.dark-toggle {
+  background: rgba(255,255,255,0.15); border: none;
+  border-radius: 8px; padding: 8px 12px; font-size: 16px;
+  cursor: pointer; transition: background 0.2s;
+}
+.dark-toggle:hover { background: rgba(255,255,255,0.25); }
+
+/* ── Streak ── */
+.streak-bar {
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  color: white; padding: 10px 20px; border-radius: 10px;
+  font-size: 14px; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* ── Calendar ── */
+.cal-wrap {
+  background: white; border-radius: var(--radius);
+  padding: 20px; box-shadow: var(--shadow); margin-bottom: 20px;
+}
+
+.cal-grid-header {
+  display: grid; grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 8px;
+}
+.cal-day-name {
+  text-align: center; font-size: 12px; font-weight: 700;
+  color: var(--text-light); padding: 4px 0;
+}
+
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+
+.cal-cell {
+  aspect-ratio: 1; border-radius: 8px; display: flex;
+  flex-direction: column; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 500; position: relative;
+  background: var(--bg); border: 1px solid var(--border);
+  cursor: default;
+}
+.cal-cell.empty { background: transparent; border: none; }
+.cal-cell.present { background: #d1fae5; border-color: #6ee7b7; color: #065f46; font-weight: 700; }
+.cal-cell.leave { background: #fef3c7; border-color: #fcd34d; color: #92400e; }
+.cal-cell.today { border: 2px solid var(--primary); font-weight: 800; }
+
+.cal-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  position: absolute; bottom: 3px;
+}
+.cal-dot.green { background: var(--success); }
+.cal-dot.orange { background: var(--warning); }
+
+.cal-legend {
+  display: flex; gap: 16px; margin-top: 12px;
+  font-size: 12px; color: var(--text-light);
+}
+.cal-legend span { display: flex; align-items: center; gap: 6px; }
+
+/* ── Mark all read ── */
+.btn-mark-read {
+  padding: 7px 14px; background: var(--primary-light); color: var(--primary);
+  border: none; border-radius: 8px; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: background 0.2s; font-family: inherit;
+}
+.btn-mark-read:hover { background: #c7d2fe; }
+
+/* ── Form groups in profile ── */
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group label { font-size: 13px; font-weight: 600; color: var(--text); }
+.form-group input, .form-group select {
+  padding: 10px 12px; border: 1.5px solid var(--border);
+  border-radius: 8px; font-size: 14px; font-family: inherit;
+  background: var(--bg); transition: border-color 0.2s;
+}
+.form-group input:focus, .form-group select:focus { border-color: var(--primary); outline: none; background: white; }
+
+@media (max-width: 700px) {
+  .dash-tabs { flex-wrap: wrap; }
+  [style*="grid-template-columns: 1fr 1fr"] { grid-template-columns: 1fr !important; }
+}
