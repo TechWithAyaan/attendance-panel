@@ -5,6 +5,7 @@ import { db, auth } from "../firebase";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
+import MonthlySummary from "../components/MonthlySummary";
 import "./AdminPanel.css";
 
 const SALARY_PER_DAY = 500;
@@ -314,6 +315,7 @@ export default function AdminPanel() {
         <div className="sidebar-brand"><span>🏢</span><span>Admin Panel</span></div>        <nav className="sidebar-nav">
           <button className={tab === "users" ? "active" : ""} onClick={() => setTab("users")}><span>👥</span> Employees</button>
           <button className={tab === "attendance" ? "active" : ""} onClick={() => setTab("attendance")}><span>📋</span> Attendance</button>
+          <button className={tab === "summary" ? "active" : ""} onClick={() => setTab("summary")}><span>📊</span> Summary</button>
           <button className={tab === "reports" ? "active" : ""} onClick={() => setTab("reports")}>
             <span>🚨</span> Reports {unreadReports > 0 && <span className="badge-count">{unreadReports}</span>}
           </button>
@@ -414,6 +416,9 @@ export default function AdminPanel() {
             )}
           </div>
         )}
+
+        {/* SUMMARY TAB */}
+        {tab === "summary" && <MonthlySummary users={users} />}
 
         {/* ATTENDANCE TAB */}
         {tab === "attendance" && (

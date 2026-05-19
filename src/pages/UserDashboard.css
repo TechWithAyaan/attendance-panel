@@ -504,3 +504,13 @@ body.dark .cal-cell.today { background: #1e1b4b; }
   .dash-tabs { flex-wrap: wrap; }
   [style*="grid-template-columns: 1fr 1fr"] { grid-template-columns: 1fr !important; }
 }
+
+/* Slip button used in dashboard */
+.slip-btn {
+  padding: 9px 16px; border: none; border-radius: 8px;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  font-family: inherit; transition: opacity 0.2s;
+}
+.slip-btn:hover { opacity: 0.85; }
+.slip-btn.print { background: #1e1b4b; color: white; }
+.slip-btn.whatsapp { background: #25d366; color: white; }

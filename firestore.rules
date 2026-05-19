@@ -1,0 +1,56 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper: check if user is admin
+    function isAdmin() {
+      return request.auth != null &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Helper: check if logged in
+    function isLoggedIn() {
+      return request.auth != null;
+    }
+
+    // Users collection
+    match /users/{uid} {
+      // User can read/write their own doc; admin can read/write all
+      allow read: if isLoggedIn() && (request.auth.uid == uid || isAdmin());
+      allow write: if isLoggedIn() && (request.auth.uid == uid || isAdmin());
+    }
+
+    // Attendance — employees read own, admin reads all, only admin writes
+    match /attendance/{doc} {
+      allow read: if isLoggedIn() && (resource.data.uid == request.auth.uid || isAdmin());
+      allow write: if isAdmin();
+    }
+
+    // Salary history — employees read own, admin reads/writes all
+    match /salaryHistory/{doc} {
+      allow read: if isLoggedIn() && (resource.data.uid == request.auth.uid || isAdmin());
+      allow write: if isAdmin();
+    }
+
+    // Notes history — employees read own, admin writes
+    match /noteHistory/{doc} {
+      allow read: if isLoggedIn() && (resource.data.uid == request.auth.uid || isAdmin());
+      allow write: if isAdmin();
+      allow update: if isLoggedIn() && resource.data.uid == request.auth.uid; // mark as read
+    }
+
+    // Reports — employees create/read own, admin reads/updates all
+    match /reports/{doc} {
+      allow read: if isLoggedIn() && (resource.data.uid == request.auth.uid || isAdmin());
+      allow create: if isLoggedIn();
+      allow update: if isAdmin();
+    }
+
+    // Leaves — employees create/read own, admin reads/updates all
+    match /leaves/{doc} {
+      allow read: if isLoggedIn() && (resource.data.uid == request.auth.uid || isAdmin());
+      allow create: if isLoggedIn();
+      allow update: if isAdmin();
+    }
+  }
+}

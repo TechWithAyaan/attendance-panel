@@ -5,6 +5,8 @@ import { db, auth } from "../firebase";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import ProfilePhoto from "../components/ProfilePhoto";
+import SalarySlip from "../components/SalarySlip";
 import "./UserDashboard.css";
 
 // ── Attendance Calendar ──
@@ -66,6 +68,7 @@ export default function UserDashboard() {
   const [advanceForm, setAdvanceForm] = useState({ amount: "", reason: "" });
   const [submittingAdvance, setSubmittingAdvance] = useState(false);
   const [advances, setAdvances] = useState([]);
+  const [showSlip, setShowSlip] = useState(false);
 
   useEffect(() => {
     if (userData?.pendingNote && userData?.noteRead === false) setNotePopup(userData.pendingNote);
@@ -274,7 +277,7 @@ export default function UserDashboard() {
 
       <div className="dash-container">
         <div className="dash-profile">
-          <div className="dash-avatar">{userData?.name?.[0]?.toUpperCase()}</div>
+          <ProfilePhoto uid={user?.uid} photoURL={userData?.photoURL} name={userData?.name} size={72} />
           <div className="dash-profile-details">
             <h2>{userData?.name}</h2>
             <div className="dash-info-row">
@@ -283,10 +286,15 @@ export default function UserDashboard() {
               <span>🏷️ {userData?.role}</span>
             </div>
           </div>
-          <div className="dash-emp-code">
-            <div className="code-label">Your Employee Code</div>
-            <div className="code-value">{userData?.employeeCode}</div>
-            <div className="code-hint">Show this to admin for check-in</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "flex-end" }}>
+            <div className="dash-emp-code">
+              <div className="code-label">Your Employee Code</div>
+              <div className="code-value">{userData?.employeeCode}</div>
+              <div className="code-hint">Show this to admin for check-in</div>
+            </div>
+            <button className="slip-btn print" style={{ fontSize: 12, padding: "7px 14px" }} onClick={() => setShowSlip(true)}>
+              📄 Download Salary Slip
+            </button>
           </div>
         </div>
 
@@ -508,6 +516,18 @@ export default function UserDashboard() {
           </div>
         )}
       </div>
+
+      {showSlip && userData && (
+        <SalarySlip
+          user={{ ...userData, id: user.uid }}
+          month={month}
+          attendance={attendance}
+          totalEarned={totalEarned}
+          totalPaid={totalPaid}
+          pending={pending}
+          onClose={() => setShowSlip(false)}
+        />
+      )}
     </div>
   );
 }
