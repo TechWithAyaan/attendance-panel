@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { collection, getDocs, addDoc, query, where, orderBy, doc, updateDoc } from "firebase/firestore";
+import { collection, getDocs, addDoc, query, where, orderBy, doc, updateDoc, deleteDoc } from "firebase/firestore";
 import { signOut } from "firebase/auth";
 import { db, auth } from "../firebase";
 import { useNavigate } from "react-router-dom";
@@ -169,6 +169,15 @@ export default function AdminPanel() {
     } catch { toast.error("Failed to deactivate employee"); }
   }
 
+  async function handleHardDelete(u) {
+    if (!window.confirm(`Permanently DELETE ${u.name}? All their data will be lost. This cannot be undone.`)) return;
+    try {
+      await deleteDoc(doc(db, "users", u.id));
+      toast.success(`${u.name} permanently deleted`);
+      fetchUsers();
+    } catch { toast.error("Failed to delete employee"); }
+  }
+
   async function handleReply(e) {
     e.preventDefault(); setSendingReply(true);
     try {
@@ -236,6 +245,7 @@ export default function AdminPanel() {
                               <button onClick={(e) => { e.stopPropagation(); setMenuOpen(null); openUpdateModal(u); }}>✏️ Update</button>
                               <button onClick={(e) => { e.stopPropagation(); setMenuOpen(null); setNoteModal(u); setNoteText(""); }}>📝 Send Note</button>
                               <button className="delete-opt" onClick={(e) => { e.stopPropagation(); setMenuOpen(null); handleSoftDelete(u); }}>🚫 Deactivate</button>
+                              <button className="delete-opt" onClick={(e) => { e.stopPropagation(); setMenuOpen(null); handleHardDelete(u); }}>🗑️ Delete Permanently</button>
                             </div>
                           )}
                         </div>
