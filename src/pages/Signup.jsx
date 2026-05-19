@@ -19,14 +19,8 @@ export default function Signup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (form.password !== form.confirm) {
-      toast.error("Passwords do not match");
-      return;
-    }
-    if (form.password.length < 6) {
-      toast.error("Password must be at least 6 characters");
-      return;
-    }
+    if (form.password !== form.confirm) { toast.error("Passwords do not match"); return; }
+    if (form.password.length < 6) { toast.error("Password must be at least 6 characters"); return; }
     setLoading(true);
     try {
       const cred = await createUserWithEmailAndPassword(auth, form.email, form.password);
@@ -66,6 +60,7 @@ export default function Signup() {
           <p>Fill in your details to register</p>
         </div>
         <form onSubmit={handleSubmit} className="auth-form">
+
           <div className="form-row">
             <div className="form-group">
               <label>Full Name *</label>
@@ -76,6 +71,7 @@ export default function Signup() {
               <input type="email" placeholder="you@example.com" value={form.email} onChange={set("email")} required />
             </div>
           </div>
+
           <div className="form-row">
             <div className="form-group">
               <label>Phone Number *</label>
@@ -86,6 +82,7 @@ export default function Signup() {
               <input type="text" placeholder="42101-1234567-1" value={form.cnic} onChange={set("cnic")} />
             </div>
           </div>
+
           <div className="form-row">
             <div className="form-group">
               <label>Role *</label>
@@ -100,12 +97,14 @@ export default function Signup() {
               <input type="password" placeholder="Min 6 characters" value={form.password} onChange={set("password")} required />
             </div>
           </div>
+
           <div className="form-row">
             <div className="form-group">
               <label>Confirm Password *</label>
               <input type="password" placeholder="Repeat password" value={form.confirm} onChange={set("confirm")} required />
             </div>
           </div>
+
           <button type="submit" className="btn-primary" disabled={loading}>
             {loading ? "Creating Account..." : "Create Account"}
           </button>
