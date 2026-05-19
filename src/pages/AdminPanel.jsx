@@ -207,6 +207,14 @@ export default function AdminPanel() {
     } catch { toast.error("Failed to deactivate employee"); }
   }
 
+  async function handleActivate(u) {
+    try {
+      await updateDoc(doc(db, "users", u.id), { status: "active" });
+      toast.success(`${u.name} activated`);
+      fetchUsers();
+    } catch { toast.error("Failed to activate employee"); }
+  }
+
   async function handleHardDelete(u) {
     if (!window.confirm(`Permanently DELETE ${u.name}? All their data will be lost. This cannot be undone.`)) return;
     try {
@@ -246,7 +254,6 @@ export default function AdminPanel() {
             <span>🚨</span> Reports {unreadReports > 0 && <span className="badge-count">{unreadReports}</span>}
           </button>
           <button className={tab === "leaves" ? "active" : ""} onClick={() => setTab("leaves")}><span>🏖️</span> Leaves</button>
-          <button className={tab === "advances" ? "active" : ""} onClick={() => setTab("advances")}><span>💵</span> Advances</button>
         </nav>
         <div className="sidebar-footer">
           <div className="admin-info">
@@ -284,7 +291,11 @@ export default function AdminPanel() {
                             <div className="dot-dropdown">
                               <button onClick={(e) => { e.stopPropagation(); setMenuOpen(null); openUpdateModal(u); }}>✏️ Update</button>
                               <button onClick={(e) => { e.stopPropagation(); setMenuOpen(null); setNoteModal(u); setNoteText(""); }}>📝 Send Note</button>
-                              <button className="delete-opt" onClick={(e) => { e.stopPropagation(); setMenuOpen(null); handleSoftDelete(u); }}>🚫 Deactivate</button>
+                              {u.status === "inactive" ? (
+                                <button onClick={(e) => { e.stopPropagation(); setMenuOpen(null); handleActivate(u); }}>✅ Activate</button>
+                              ) : (
+                                <button className="delete-opt" onClick={(e) => { e.stopPropagation(); setMenuOpen(null); handleSoftDelete(u); }}>🚫 Deactivate</button>
+                              )}
                               <button className="delete-opt" onClick={(e) => { e.stopPropagation(); setMenuOpen(null); handleHardDelete(u); }}>🗑️ Delete Permanently</button>
                             </div>
                           )}
