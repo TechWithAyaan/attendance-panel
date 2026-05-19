@@ -71,6 +71,16 @@
   flex-shrink: 0;
 }
 
+.dash-avatar-letter {
+  width: 72px; height: 72px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 28px; font-weight: 800;
+  flex-shrink: 0;
+  border: 3px solid #4f46e5;
+}
+
 .dash-profile-details { flex: 1; }
 
 .dash-profile-details h2 {

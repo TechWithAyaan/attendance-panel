@@ -62,6 +62,14 @@
   flex-shrink: 0;
 }
 
+/* When ud-avatar is an img tag (has photo) */
+img.ud-avatar {
+  background: none;
+  object-fit: cover;
+  border: 3px solid #4f46e5;
+  display: block;
+}
+
 .ud-hero-name h2 {
   font-size: 22px;
   font-weight: 700;

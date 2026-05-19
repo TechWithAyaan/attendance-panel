@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState, useRef } from "react";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
 import { auth, db } from "../firebase";
 
 const AuthContext = createContext(null);
@@ -10,28 +10,53 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const unsubUserRef = useRef(null);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
+    const unsubAuth = onAuthStateChanged(auth, (firebaseUser) => {
+      // Clean up previous Firestore listener if any
+      if (unsubUserRef.current) {
+        unsubUserRef.current();
+        unsubUserRef.current = null;
+      }
+
       setUser(firebaseUser);
+
       if (firebaseUser) {
-        const snap = await getDoc(doc(db, "users", firebaseUser.uid));
-        setUserData(snap.exists() ? snap.data() : null);
-        // Session timeout
+        // Session timeout check
         const loginTime = localStorage.getItem("loginTime");
         if (loginTime && Date.now() - Number(loginTime) > SESSION_TIMEOUT) {
-          await signOut(auth);
+          signOut(auth);
           localStorage.removeItem("loginTime");
+          setLoading(false);
           return;
         }
         if (!loginTime) localStorage.setItem("loginTime", Date.now().toString());
+
+        // Real-time listener on user document — updates userData whenever Firestore changes
+        unsubUserRef.current = onSnapshot(
+          doc(db, "users", firebaseUser.uid),
+          (snap) => {
+            const data = snap.exists() ? snap.data() : null;
+            setUserData(data);
+            setLoading(false);
+          },
+          () => {
+            setUserData(null);
+            setLoading(false);
+          }
+        );
       } else {
         setUserData(null);
         localStorage.removeItem("loginTime");
+        setLoading(false);
       }
-      setLoading(false);
     });
-    return unsub;
+
+    return () => {
+      unsubAuth();
+      if (unsubUserRef.current) unsubUserRef.current();
+    };
   }, []);
 
   return (

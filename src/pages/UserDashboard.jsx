@@ -5,7 +5,6 @@ import { db, auth } from "../firebase";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import ProfilePhoto from "../components/ProfilePhoto";
 import SalarySlip from "../components/SalarySlip";
 import "./UserDashboard.css";
 
@@ -277,7 +276,9 @@ export default function UserDashboard() {
 
       <div className="dash-container">
         <div className="dash-profile">
-          <ProfilePhoto uid={user?.uid} photoURL={userData?.photoURL} name={userData?.name} size={72} />
+          <div className="dash-avatar-letter">
+            {userData?.name?.[0]?.toUpperCase()}
+          </div>
           <div className="dash-profile-details">
             <h2>{userData?.name}</h2>
             <div className="dash-info-row">
