@@ -48,7 +48,6 @@ export default function UserDashboard() {
   const { user, userData } = useAuth();
   const navigate = useNavigate();
   const [tab, setTab] = useState("overview");
-  const [darkMode, setDarkMode] = useState(() => localStorage.getItem("darkMode") === "true");
   const [attendance, setAttendance] = useState([]);
   const [salaryHistory, setSalaryHistory] = useState([]);
   const [leaves, setLeaves] = useState([]);
@@ -67,11 +66,6 @@ export default function UserDashboard() {
   const [advanceForm, setAdvanceForm] = useState({ amount: "", reason: "" });
   const [submittingAdvance, setSubmittingAdvance] = useState(false);
   const [advances, setAdvances] = useState([]);
-
-  useEffect(() => {
-    document.body.classList.toggle("dark", darkMode);
-    localStorage.setItem("darkMode", darkMode);
-  }, [darkMode]);
 
   useEffect(() => {
     if (userData?.pendingNote && userData?.noteRead === false) setNotePopup(userData.pendingNote);
@@ -256,7 +250,7 @@ export default function UserDashboard() {
   }
 
   return (
-    <div className={`dash-page ${darkMode ? "dark" : ""}`}>
+    <div className="dash-page">
       {notePopup && (
         <div className="note-overlay">
           <div className="note-popup">
@@ -274,9 +268,6 @@ export default function UserDashboard() {
           <div><h1>My Dashboard</h1><p>Welcome back, {userData?.name}</p></div>
         </div>
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <button className="dark-toggle" onClick={() => setDarkMode(!darkMode)} title="Toggle dark mode">
-            {darkMode ? "☀️" : "🌙"}
-          </button>
           <button className="dash-logout" onClick={() => { signOut(auth); navigate("/login"); }}>🚪 Sign Out</button>
         </div>
       </header>
