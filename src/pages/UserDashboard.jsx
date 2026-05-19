@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, query, where, getDocs, doc, updateDoc } from "firebase/firestore";
 import { signOut } from "firebase/auth";
 import { db, auth } from "../firebase";
 import { useAuth } from "../context/AuthContext";
@@ -12,6 +12,21 @@ export default function UserDashboard() {
   const [attendance, setAttendance] = useState([]);
   const [salaryHistory, setSalaryHistory] = useState([]);
   const [month, setMonth] = useState(new Date().toISOString().slice(0, 7));
+  const [notePopup, setNotePopup] = useState(null);
+
+  // Show note popup if there's an unread note
+  useEffect(() => {
+    if (userData?.pendingNote && userData?.noteRead === false) {
+      setNotePopup(userData.pendingNote);
+    }
+  }, [userData]);
+
+  async function dismissNote() {
+    setNotePopup(null);
+    try {
+      await updateDoc(doc(db, "users", user.uid), { noteRead: true });
+    } catch {}
+  }
 
   useEffect(() => {
     if (!user) return;
@@ -45,6 +60,17 @@ export default function UserDashboard() {
 
   return (
     <div className="dash-page">
+      {/* Note Popup */}
+      {notePopup && (
+        <div className="note-overlay">
+          <div className="note-popup">
+            <div className="note-popup-icon">📝</div>
+            <h3>Message from Admin</h3>
+            <p className="note-popup-text">{notePopup}</p>
+            <button className="btn-primary" onClick={dismissNote}>Got it ✓</button>
+          </div>
+        </div>
+      )}
       <header className="dash-header">
         <div className="dash-header-left">
           <div className="dash-logo">🏢</div>

@@ -231,3 +231,62 @@
   .dash-header { padding: 14px 16px; }
   .dash-container { padding: 16px; }
 }
+
+/* ── Note Popup ── */
+.note-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.note-popup {
+  background: white;
+  border-radius: 20px;
+  padding: 36px 32px;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  animation: popIn 0.3s ease;
+}
+
+@keyframes popIn {
+  from { transform: scale(0.85); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+.note-popup-icon { font-size: 48px; margin-bottom: 12px; }
+
+.note-popup h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 14px;
+  color: var(--text);
+}
+
+.note-popup-text {
+  font-size: 15px;
+  color: var(--text);
+  line-height: 1.6;
+  background: #f8fafc;
+  border-left: 4px solid var(--primary);
+  padding: 14px 16px;
+  border-radius: 8px;
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.note-popup .btn-primary {
+  padding: 12px 32px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  background: var(--primary);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.note-popup .btn-primary:hover { background: var(--primary-dark); }
