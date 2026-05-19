@@ -38,14 +38,19 @@ export default function AdminPanel() {
   const [leaves, setLeaves] = useState([]);
   const [advances, setAdvances] = useState([]);
 
-  useEffect(() => { fetchUsers(); }, []);
+  // Notifications & salary reminder
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [adminNotifs, setAdminNotifs] = useState([]);
+  const [salaryReminder, setSalaryReminder] = useState(false);
+
+  useEffect(() => { fetchUsers(); fetchAdminNotifs(); checkSalaryReminder(); }, []);
   useEffect(() => {
     if (tab === "reports") fetchReports();
     if (tab === "leaves") fetchLeaves();
     if (tab === "advances") fetchAdvances();
   }, [tab]);
   useEffect(() => {
-    const handler = () => setMenuOpen(null);
+    const handler = () => { setMenuOpen(null); setNotifOpen(false); };
     document.addEventListener("click", handler);
     return () => document.removeEventListener("click", handler);
   }, []);
@@ -58,6 +63,50 @@ export default function AdminPanel() {
       setUsers(list.filter((u) => u.role !== "admin"));
     } catch { toast.error("Failed to load employees"); }
     setLoadingUsers(false);
+  }
+
+  async function fetchAdminNotifs() {
+    try {
+      const notifs = [];
+      // New unread reports
+      const repSnap = await getDocs(collection(db, "reports"));
+      repSnap.docs.forEach(d => {
+        const r = d.data();
+        if (r.status !== "resolved") notifs.push({ id: d.id, type: "report", text: `🚨 ${r.userName} reported an issue`, time: r.createdAt });
+      });
+      // Pending leaves
+      const leaveSnap = await getDocs(collection(db, "leaves"));
+      leaveSnap.docs.forEach(d => {
+        const l = d.data();
+        if (l.status === "pending") notifs.push({ id: d.id, type: "leave", text: `🏖️ ${l.userName} requested leave on ${l.date}`, time: l.createdAt });
+      });
+      // New employees (last 7 days)
+      const userSnap = await getDocs(collection(db, "users"));
+      userSnap.docs.forEach(d => {
+        const u = d.data();
+        if (u.role !== "admin" && u.createdAt) {
+          const diff = (Date.now() - new Date(u.createdAt)) / 86400000;
+          if (diff <= 7) notifs.push({ id: d.id, type: "user", text: `👤 New employee joined: ${u.name}`, time: u.createdAt });
+        }
+      });
+      notifs.sort((a, b) => new Date(b.time) - new Date(a.time));
+      setAdminNotifs(notifs);
+    } catch {}
+  }
+
+  function checkSalaryReminder() {
+    const today = new Date().getDate();
+    const dismissed = localStorage.getItem("salaryReminderDismissed");
+    const thisMonth = new Date().toISOString().slice(0, 7);
+    if (today === 1 && dismissed !== thisMonth) {
+      setSalaryReminder(true);
+    }
+  }
+
+  function dismissSalaryReminder() {
+    const thisMonth = new Date().toISOString().slice(0, 7);
+    localStorage.setItem("salaryReminderDismissed", thisMonth);
+    setSalaryReminder(false);
   }
 
   async function fetchReports() {
@@ -246,8 +295,7 @@ export default function AdminPanel() {
   return (
     <div className="admin-layout">
       <aside className="sidebar">
-        <div className="sidebar-brand"><span>🏢</span><span>Admin Panel</span></div>
-        <nav className="sidebar-nav">
+        <div className="sidebar-brand"><span>🏢</span><span>Admin Panel</span></div>        <nav className="sidebar-nav">
           <button className={tab === "users" ? "active" : ""} onClick={() => setTab("users")}><span>👥</span> Employees</button>
           <button className={tab === "attendance" ? "active" : ""} onClick={() => setTab("attendance")}><span>📋</span> Attendance</button>
           <button className={tab === "reports" ? "active" : ""} onClick={() => setTab("reports")}>
@@ -265,6 +313,32 @@ export default function AdminPanel() {
       </aside>
 
       <main className="admin-main">
+        {/* Notification Bell */}
+        <div className="admin-topbar">
+          <div className="notif-bell-wrap" onClick={(e) => { e.stopPropagation(); setNotifOpen(!notifOpen); }}>
+            <button className="notif-bell-btn">
+              🔔
+              {adminNotifs.length > 0 && <span className="notif-bell-badge">{adminNotifs.length}</span>}
+            </button>
+            {notifOpen && (
+              <div className="notif-dropdown" onClick={(e) => e.stopPropagation()}>
+                <div className="notif-dropdown-header">
+                  <h4>Notifications</h4>
+                  <span>{adminNotifs.length} new</span>
+                </div>
+                {adminNotifs.length === 0 ? (
+                  <div className="notif-empty">No new notifications</div>
+                ) : adminNotifs.map((n, i) => (
+                  <div key={i} className={`notif-item notif-${n.type}`}
+                    onClick={() => { setNotifOpen(false); if (n.type === "report") setTab("reports"); else if (n.type === "leave") setTab("leaves"); else setTab("users"); }}>
+                    <p>{n.text}</p>
+                    <span>{new Date(n.time).toLocaleDateString("en-US")}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
         {/* EMPLOYEES TAB */}
         {tab === "users" && (
           <div>
@@ -593,6 +667,24 @@ export default function AdminPanel() {
                 <button type="submit" className="btn-primary" disabled={sendingReply}>{sendingReply ? "Sending..." : "💬 Send Reply"}</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* Salary Reminder Popup */}
+      {salaryReminder && (
+        <div className="modal-overlay">
+          <div className="modal" style={{ textAlign: "center" }}>
+            <div style={{ fontSize: 52, marginBottom: 12 }}>💰</div>
+            <h3 style={{ fontSize: 20, marginBottom: 8 }}>Salary Reminder</h3>
+            <p style={{ color: "var(--text-light)", fontSize: 14, marginBottom: 20 }}>
+              It's the 1st of the month! Time to review and pay employee salaries.
+            </p>
+            <div className="modal-actions">
+              <button className="btn-cancel" onClick={dismissSalaryReminder}>Dismiss</button>
+              <button className="btn-primary" onClick={() => { dismissSalaryReminder(); setTab("users"); }}>
+                💸 Go to Employees
+              </button>
+            </div>
           </div>
         </div>
       )}
