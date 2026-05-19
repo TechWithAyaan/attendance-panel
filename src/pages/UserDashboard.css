@@ -366,3 +366,43 @@
 .report-reply { background: #f0fdf4; border-left: 3px solid var(--success); padding: 10px 14px; border-radius: 6px; }
 .report-reply span { font-size: 11px; font-weight: 700; color: var(--success); text-transform: uppercase; }
 .report-reply p { font-size: 13px; margin-top: 4px; }
+
+/* ── Restricted Screen ── */
+.restricted-page {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #1e1b4b, #4f46e5);
+  padding: 20px;
+}
+
+.restricted-card {
+  background: white;
+  border-radius: 20px;
+  padding: 48px 40px;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.restricted-icon { font-size: 64px; margin-bottom: 20px; }
+
+.restricted-card h2 {
+  font-size: 22px; font-weight: 700;
+  color: var(--text); margin-bottom: 12px;
+}
+
+.restricted-card p {
+  font-size: 14px; color: var(--text-light);
+  line-height: 1.6; margin-bottom: 28px;
+}
+
+.restricted-card .btn-primary {
+  padding: 12px 32px;
+  background: var(--danger);
+  color: white; border: none;
+  border-radius: 10px; font-size: 15px;
+  font-weight: 600; cursor: pointer;
+  transition: background 0.2s; font-family: inherit;
+}
+.restricted-card .btn-primary:hover { background: #dc2626; }

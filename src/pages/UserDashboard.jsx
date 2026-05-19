@@ -93,6 +93,22 @@ export default function UserDashboard() {
   const pending = Math.max(0, totalEarned - totalPaid);
   const unreadNotes = notifications.filter(n => !n.read).length;
 
+  // ── Inactive user screen ──
+  if (userData?.status === "inactive") {
+    return (
+      <div className="restricted-page">
+        <div className="restricted-card">
+          <div className="restricted-icon">🚫</div>
+          <h2>Account Temporarily Restricted</h2>
+          <p>Your account has been deactivated by the admin. Please contact your administrator for more information.</p>
+          <button className="btn-primary" onClick={() => { signOut(auth); navigate("/login"); }}>
+            Sign Out
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="dash-page">
       {notePopup && (
@@ -188,13 +204,17 @@ export default function UserDashboard() {
         {tab === "notifications" && (
           <div className="notif-list">
             {notifications.length === 0 ? (
-              <div className="empty-state-box"><div className="empty-icon">🔔</div><h3>No notifications yet</h3><p>Admin notes will appear here</p></div>
+              <div className="empty-state-box">
+                <div className="empty-icon">🔔</div>
+                <h3>No notifications yet</h3>
+                <p>Messages from admin will appear here</p>
+              </div>
             ) : notifications.map((n) => (
               <div key={n.id} className={`notif-card ${!n.read ? "unread" : ""}`}>
                 <div className="notif-icon">📝</div>
                 <div className="notif-body">
                   <p>{n.message}</p>
-                  <span>{new Date(n.sentAt).toLocaleDateString("en-US")} — {new Date(n.sentAt).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}</span>
+                  <span>📅 {new Date(n.sentAt).toLocaleDateString("en-US")} at {new Date(n.sentAt).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}</span>
                 </div>
                 {!n.read && <span className="notif-new">New</span>}
               </div>
