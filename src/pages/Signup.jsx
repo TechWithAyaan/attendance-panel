@@ -12,7 +12,7 @@ function generateCode() {
 
 export default function Signup() {
   const [form, setForm] = useState({
-    name: "", email: "", phone: "", cnic: "", department: "", password: "", confirm: ""
+    name: "", email: "", phone: "", cnic: "", department: "", role: "sales", password: "", confirm: ""
   });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -37,7 +37,7 @@ export default function Signup() {
         email: form.email,
         phone: form.phone,
         cnic: form.cnic,
-        role: "employee",
+        role: form.role,
         department: form.department,
         employeeCode,
         salaryPerDay: 500,
@@ -45,7 +45,8 @@ export default function Signup() {
         status: "active",
       });
       toast.success(`Account created! Your Employee Code: ${employeeCode}`);
-      navigate("/dashboard");
+      if (form.role === "admin") navigate("/admin");
+      else navigate("/dashboard");
     } catch (err) {
       if (err.code === "auth/email-already-in-use") toast.error("Email is already registered");
       else if (err.code === "auth/network-request-failed") toast.error("Check your internet connection");
@@ -90,6 +91,14 @@ export default function Signup() {
             <div className="form-group">
               <label>Department</label>
               <input type="text" placeholder="Sales / IT / HR..." value={form.department} onChange={set("department")} />
+            </div>
+            <div className="form-group">
+              <label>Role *</label>
+              <select value={form.role} onChange={set("role")} required>
+                <option value="sales">Sales</option>
+                <option value="boosting">Boosting</option>
+                <option value="admin">Admin</option>
+              </select>
             </div>
           </div>
           <div className="form-row">
