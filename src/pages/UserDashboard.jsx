@@ -311,7 +311,6 @@ export default function UserDashboard() {
             🔔 Notifications {unreadNotes > 0 && <span className="badge-count">{unreadNotes}</span>}
           </button>
           <button className={tab === "leave" ? "active" : ""} onClick={() => setTab("leave")}>🏖️ Leave</button>
-          <button className={tab === "advance" ? "active" : ""} onClick={() => setTab("advance")}>💵 Advance</button>
           <button className={tab === "reports" ? "active" : ""} onClick={() => setTab("reports")}>🚨 Reports</button>
           <button className={tab === "profile" ? "active" : ""} onClick={() => setTab("profile")}>👤 Profile</button>
         </div>
