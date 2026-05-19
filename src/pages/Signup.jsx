@@ -95,12 +95,12 @@ export default function Signup() {
                 <option value="admin">Admin</option>
               </select>
             </div>
-          </div>
-          <div className="form-row">
             <div className="form-group">
               <label>Password *</label>
               <input type="password" placeholder="Min 6 characters" value={form.password} onChange={set("password")} required />
             </div>
+          </div>
+          <div className="form-row">
             <div className="form-group">
               <label>Confirm Password *</label>
               <input type="password" placeholder="Repeat password" value={form.confirm} onChange={set("confirm")} required />
