@@ -12,7 +12,7 @@ function generateCode() {
 
 export default function Signup() {
   const [form, setForm] = useState({
-    name: "", email: "", phone: "", cnic: "", department: "", role: "sales", password: "", confirm: ""
+    name: "", email: "", phone: "", cnic: "", role: "sales", password: "", confirm: ""
   });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -38,7 +38,6 @@ export default function Signup() {
         phone: form.phone,
         cnic: form.cnic,
         role: form.role,
-        department: form.department,
         employeeCode,
         salaryPerDay: 500,
         createdAt: new Date().toISOString(),
@@ -88,10 +87,6 @@ export default function Signup() {
             </div>
           </div>
           <div className="form-row">
-            <div className="form-group">
-              <label>Department</label>
-              <input type="text" placeholder="Sales / IT / HR..." value={form.department} onChange={set("department")} />
-            </div>
             <div className="form-group">
               <label>Role *</label>
               <select value={form.role} onChange={set("role")} required>
