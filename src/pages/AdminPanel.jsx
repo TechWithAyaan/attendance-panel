@@ -42,6 +42,9 @@ export default function AdminPanel() {
   const [notifOpen, setNotifOpen] = useState(false);
   const [adminNotifs, setAdminNotifs] = useState([]);
   const [salaryReminder, setSalaryReminder] = useState(false);
+  const [readNotifIds, setReadNotifIds] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("adminReadNotifs") || "[]"); } catch { return []; }
+  });
 
   useEffect(() => { fetchUsers(); fetchAdminNotifs(); checkSalaryReminder(); }, []);
   useEffect(() => {
@@ -107,6 +110,18 @@ export default function AdminPanel() {
     const thisMonth = new Date().toISOString().slice(0, 7);
     localStorage.setItem("salaryReminderDismissed", thisMonth);
     setSalaryReminder(false);
+  }
+
+  function markNotifRead(notifId) {
+    const updated = [...readNotifIds, notifId];
+    setReadNotifIds(updated);
+    localStorage.setItem("adminReadNotifs", JSON.stringify(updated));
+  }
+
+  function markAllNotifsRead() {
+    const allIds = adminNotifs.map(n => n.id);
+    setReadNotifIds(allIds);
+    localStorage.setItem("adminReadNotifs", JSON.stringify(allIds));
   }
 
   async function fetchReports() {
@@ -291,6 +306,7 @@ export default function AdminPanel() {
     u.employeeCode?.includes(searchUser)
   );
   const unreadReports = reports.filter(r => r.status !== "resolved").length;
+  const unreadNotifs = adminNotifs.filter(n => !readNotifIds.includes(n.id)).length;
 
   return (
     <div className="admin-layout">
@@ -318,19 +334,25 @@ export default function AdminPanel() {
           <div className="notif-bell-wrap" onClick={(e) => { e.stopPropagation(); setNotifOpen(!notifOpen); }}>
             <button className="notif-bell-btn">
               🔔
-              {adminNotifs.length > 0 && <span className="notif-bell-badge">{adminNotifs.length}</span>}
+              {unreadNotifs > 0 && <span className="notif-bell-badge">{unreadNotifs}</span>}
             </button>
             {notifOpen && (
               <div className="notif-dropdown" onClick={(e) => e.stopPropagation()}>
                 <div className="notif-dropdown-header">
                   <h4>Notifications</h4>
-                  <span>{adminNotifs.length} new</span>
+                  {unreadNotifs > 0 && <button className="btn-mark-all" onClick={markAllNotifsRead}>Mark all read</button>}
                 </div>
                 {adminNotifs.length === 0 ? (
                   <div className="notif-empty">No new notifications</div>
                 ) : adminNotifs.map((n, i) => (
-                  <div key={i} className={`notif-item notif-${n.type}`}
-                    onClick={() => { setNotifOpen(false); if (n.type === "report") setTab("reports"); else if (n.type === "leave") setTab("leaves"); else setTab("users"); }}>
+                  <div key={i} className={`notif-item notif-${n.type} ${readNotifIds.includes(n.id) ? "read" : ""}`}
+                    onClick={() => {
+                      markNotifRead(n.id);
+                      setNotifOpen(false);
+                      if (n.type === "report") setTab("reports");
+                      else if (n.type === "leave") setTab("leaves");
+                      else setTab("users");
+                    }}>
                     <p>{n.text}</p>
                     <span>{new Date(n.time).toLocaleDateString("en-US")}</span>
                   </div>

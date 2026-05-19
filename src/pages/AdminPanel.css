@@ -755,3 +755,10 @@
 .notif-item.notif-report { border-left-color: var(--danger); }
 .notif-item.notif-leave  { border-left-color: var(--warning); }
 .notif-item.notif-user   { border-left-color: var(--success); }
+
+.notif-item.read { opacity: 0.45; }
+.btn-mark-all {
+  background: none; border: none; color: var(--primary);
+  font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit;
+}
+.btn-mark-all:hover { text-decoration: underline; }
